@@ -6,42 +6,37 @@ import { Pokemon, PokemonData } from "../interfaces";
 import styles from "../styles/Home.module.css";
 
 type HomeProps = {
-  pokemon: PokemonData;
+  pokemon: Pokemon[];
 };
 
 export const getServerSideProps: GetServerSideProps = async () => {
-  const data = await fetch("https://pokeapi.co/api/v2/pokemon?limit=20");
+  const res = await fetch("https://pokeapi.co/api/v2/pokemon?limit=20");
+  const pokemonData = await res.json();
+
+  let completePokemonData: Pokemon[] = [];
+
+  for (const pokemon of pokemonData.results) {
+    const res = await fetch(
+      `https://pokeapi.co/api/v2/pokemon/${pokemon.name}`
+    );
+    const data = await res.json();
+    completePokemonData.push(data);
+  }
   return {
-    props: { pokemon: await data.json() },
+    props: { pokemon: completePokemonData },
   };
 };
 
 const Home: React.FC<HomeProps> = ({ pokemon }) => {
-  const [pokemons, setPokemons] = useState<Pokemon[] | []>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  console.log(pokemon);
 
-  const filteredPokemons = useMemo(() => {
-    return pokemons.filter((pokemon) =>
-      pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [searchQuery, pokemons]);
-
-  function createPokemonObject(results: Pokemon[]) {
-    results.forEach(async (pokemon) => {
-      const res = await fetch(
-        `https://pokeapi.co/api/v2/pokemon/${pokemon.name}`
-      );
-      const data = await res.json();
-      setPokemons((currentList) => [...currentList, data]);
-    });
-  }
-
-  useEffect(() => {
-    createPokemonObject(pokemon.results);
-  }, []);
-
-  console.log("pokemons", pokemons);
+  const filteredPokemons = useMemo(
+    () =>
+      pokemon.filter((pokemon) =>
+        pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
+      ),
+    [searchQuery, pokemon]
+  );
 
   return (
     <div className={styles.container}>
