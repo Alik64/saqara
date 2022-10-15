@@ -1,6 +1,6 @@
+import { useEffect, useMemo, useState } from "react";
 import { GetServerSideProps } from "next";
 import Head from "next/head";
-import { useEffect, useState } from "react";
 import { Pokemon, PokemonData } from "../interfaces";
 
 import styles from "../styles/Home.module.css";
@@ -10,7 +10,7 @@ type HomeProps = {
 };
 
 export const getServerSideProps: GetServerSideProps = async () => {
-  const data = await fetch("https://pokeapi.co/api/v2/pokemon");
+  const data = await fetch("https://pokeapi.co/api/v2/pokemon?limit=20");
   return {
     props: { pokemon: await data.json() },
   };
@@ -18,7 +18,14 @@ export const getServerSideProps: GetServerSideProps = async () => {
 
 const Home: React.FC<HomeProps> = ({ pokemon }) => {
   const [pokemons, setPokemons] = useState<Pokemon[] | []>([]);
-  const [filter, setFilter] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  console.log(pokemon);
+
+  const filteredPokemons = useMemo(() => {
+    return pokemons.filter((pokemon) =>
+      pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery, pokemons]);
 
   function createPokemonObject(results: Pokemon[]) {
     results.forEach(async (pokemon) => {
@@ -46,13 +53,13 @@ const Home: React.FC<HomeProps> = ({ pokemon }) => {
       <div>
         <input
           type="text"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
           className={styles.search}
         />
       </div>
       <main className={styles.main}>
-        {pokemons?.map((pokemon, index) => (
+        {filteredPokemons?.map((pokemon, index) => (
           <div key={index}>
             <h1>{pokemon.name}</h1>
             <img
