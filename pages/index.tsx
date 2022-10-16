@@ -1,19 +1,28 @@
 import { useCallback, useMemo, useState } from "react";
 import { GetServerSideProps } from "next";
+import { useQuery } from "react-query";
 import Head from "next/head";
-import { Pokemon, PokemonData, PokemonSelectedData } from "../interfaces";
+import { Pokemon, PokemonData } from "../interfaces";
 
 import styles from "../styles/Home.module.css";
+import PokemonList from "../components/PokemonList";
+import Layout from "../components/Layout";
 
-type HomeProps = {
+type InitialPokemonData = {
+  count: number;
+  next: string;
   fetchedPokemons: Pokemon[];
-  data: PokemonSelectedData;
+};
+type HomeProps = {
+  initialPokemonData: InitialPokemonData;
 };
 
-export const getServerSideProps: GetServerSideProps = async () => {
-  const res = await fetch("https://pokeapi.co/api/v2/pokemon?limit=20");
+const getPokemons = async (offset: number) => {
+  const res = await fetch(
+    `https://pokeapi.co/api/v2/pokemon?offset=${offset}&limit=20`
+  );
   const pokemonData: PokemonData = await res.json();
-  const { count, next, previous } = pokemonData;
+  const { count, next } = pokemonData;
   let fetchedPokemons: Pokemon[] = [];
 
   for (const pokemon of pokemonData.results) {
@@ -23,71 +32,68 @@ export const getServerSideProps: GetServerSideProps = async () => {
     const data = await res.json();
     fetchedPokemons.push(data);
   }
+  return { fetchedPokemons, count, next };
+};
 
+export const getServerSideProps: GetServerSideProps = async () => {
   return {
-    props: { fetchedPokemons, data: { count, next, previous } },
+    props: { initialPokemonData: await getPokemons(0) },
   };
 };
 
-const Home: React.FC<HomeProps> = ({ fetchedPokemons, data }) => {
-  console.log(data);
-  const [pokemons, setPokemons] = useState<Pokemon[] | []>(fetchedPokemons);
+const Home: React.FC<HomeProps> = ({ initialPokemonData }) => {
+  const [page, setPage] = useState<number>(0);
+
+  const { data: pokemons } = useQuery(
+    ["pokemons", page],
+    () => getPokemons(page),
+    {
+      initialData: initialPokemonData,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+    }
+  );
+
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [loadMore, setLoadMore] = useState(data.next);
 
   const filteredPokemons = useMemo(
     () =>
-      pokemons?.filter((pokemon) =>
+      pokemons?.fetchedPokemons?.filter((pokemon: any) =>
         pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
       ),
     [searchQuery, pokemons]
   );
+  console.log(filteredPokemons);
 
-  const getMorePokemons = useCallback(async () => {
-    const res = await fetch(loadMore);
-    const data = await res.json();
+  const nextPageHandler = useCallback(() => {
+    setPage((prevState) => prevState + 20);
+  }, [page]);
 
-    setLoadMore(data.next);
-
-    data.results.forEach(async (pokemon: Pokemon) => {
-      const res = await fetch(
-        `https://pokeapi.co/api/v2/pokemon/${pokemon.name}`
-      );
-      const data = await res.json();
-      setPokemons((prevState) => [...prevState, data]);
-    });
-  }, [loadMore]);
-
+  const prevPageHandler = useCallback(() => {
+    if (page === 0) {
+      return;
+    }
+    setPage((prevState) => prevState - 20);
+  }, [page]);
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Pokemons</title>
-        <meta name="description" content="Pokemon codex app" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+    <Layout title="Pokemons">
       <div>
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className={styles.search}
+          placeholder="Type here to search"
         />
       </div>
       <main className={styles.main}>
-        {filteredPokemons?.map((pokemon, index) => (
-          <div key={index}>
-            <h1>{pokemon.name}</h1>
-            <img
-              src={pokemon.sprites.front_default}
-              alt="Pokemon sprit"
-              width={100}
-              height={100}
-            />
-          </div>
-        ))}
+        <PokemonList pokemons={filteredPokemons} />
       </main>
-      <button onClick={() => getMorePokemons()}>Load more</button>
-    </div>
+      <section>
+        {page > 0 && <button onClick={prevPageHandler}>Previous page</button>}
+        <button onClick={nextPageHandler}>Next page</button>
+      </section>
+    </Layout>
   );
 };
 
