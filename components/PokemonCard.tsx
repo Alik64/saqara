@@ -8,7 +8,7 @@ type PokemonCardProps = {
 const PokemonCard: React.FC<PokemonCardProps> = ({ pokemon }) => {
   return (
     <div>
-      <h1>{pokemon.name}</h1>
+      <h5>{pokemon.name}</h5>
       <img
         src={pokemon.sprites.front_default}
         alt="Pokemon sprit"

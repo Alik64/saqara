@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { GetServerSideProps } from "next";
 import { useQuery } from "react-query";
-import Head from "next/head";
+
 import { Pokemon, PokemonData } from "../interfaces";
 
 import styles from "../styles/Home.module.css";
@@ -10,7 +10,6 @@ import Layout from "../components/Layout";
 
 type InitialPokemonData = {
   count: number;
-  next: string;
   fetchedPokemons: Pokemon[];
 };
 type HomeProps = {
@@ -22,7 +21,7 @@ const getPokemons = async (offset: number) => {
     `https://pokeapi.co/api/v2/pokemon?offset=${offset}&limit=20`
   );
   const pokemonData: PokemonData = await res.json();
-  const { count, next } = pokemonData;
+  const { count } = pokemonData;
   let fetchedPokemons: Pokemon[] = [];
 
   for (const pokemon of pokemonData.results) {
@@ -32,7 +31,7 @@ const getPokemons = async (offset: number) => {
     const data = await res.json();
     fetchedPokemons.push(data);
   }
-  return { fetchedPokemons, count, next };
+  return { fetchedPokemons, count };
 };
 
 export const getServerSideProps: GetServerSideProps = async () => {
@@ -44,16 +43,15 @@ export const getServerSideProps: GetServerSideProps = async () => {
 const Home: React.FC<HomeProps> = ({ initialPokemonData }) => {
   const [page, setPage] = useState<number>(0);
 
-  const { data: pokemons } = useQuery(
+  const { data: pokemons, isLoading } = useQuery(
     ["pokemons", page],
     () => getPokemons(page),
     {
-      initialData: initialPokemonData,
       refetchOnMount: false,
       refetchOnWindowFocus: false,
     }
   );
-
+  console.log(pokemons?.count);
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   const filteredPokemons = useMemo(
@@ -75,6 +73,7 @@ const Home: React.FC<HomeProps> = ({ initialPokemonData }) => {
     }
     setPage((prevState) => prevState - 20);
   }, [page]);
+
   return (
     <Layout title="Pokemons">
       <div>
@@ -85,13 +84,34 @@ const Home: React.FC<HomeProps> = ({ initialPokemonData }) => {
           className={styles.search}
           placeholder="Type here to search"
         />
+        <select
+          name="generations"
+          id="generations"
+          onChange={(e) => setPage(Number(e.target.value))}
+        >
+          <option value="">Generations</option>
+          <option value={0}>1</option>
+          <option value={151}>2</option>
+          <option value={251}>3</option>
+          <option value={386}>4</option>
+          <option value={493}>5</option>
+          <option value={649}>6</option>
+          <option value={721}>7</option>
+          <option value={809}>8</option>
+        </select>
       </div>
       <main className={styles.main}>
-        <PokemonList pokemons={filteredPokemons} />
+        {isLoading ? (
+          <div>Loading...</div>
+        ) : (
+          <PokemonList pokemons={filteredPokemons} />
+        )}
       </main>
       <section>
         {page > 0 && <button onClick={prevPageHandler}>Previous page</button>}
-        <button onClick={nextPageHandler}>Next page</button>
+        {pokemons?.count && page < pokemons?.count - 20 && (
+          <button onClick={nextPageHandler}>Next page</button>
+        )}
       </section>
     </Layout>
   );

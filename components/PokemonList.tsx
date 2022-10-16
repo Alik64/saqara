@@ -9,7 +9,7 @@ interface PokemonListProps {
 }
 const PokemonList: React.FC<PokemonListProps> = ({ pokemons }) => {
   return (
-    <div>
+    <div style={{ display: "flex", flexWrap: "wrap" }}>
       {pokemons &&
         pokemons.map((pokemon: any, index: number) => (
           <Link href={`/pokemons/${pokemon.name}`} key={index}>
