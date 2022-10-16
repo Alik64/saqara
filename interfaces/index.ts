@@ -2,9 +2,14 @@ export interface PokemonData {
   count: number;
   next: string;
   previous: null;
-  results: Result[] |;
+  results: Result[];
 }
 
+export interface PokemonSelectedData {
+  count: number;
+  next: string;
+  previous: null;
+}
 export interface Result {
   name: string;
   url: string;
