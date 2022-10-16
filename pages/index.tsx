@@ -1,42 +1,62 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { GetServerSideProps } from "next";
 import Head from "next/head";
-import { Pokemon, PokemonData } from "../interfaces";
+import { Pokemon, PokemonData, PokemonSelectedData } from "../interfaces";
 
 import styles from "../styles/Home.module.css";
 
 type HomeProps = {
-  pokemon: Pokemon[];
+  fetchedPokemons: Pokemon[];
+  data: PokemonSelectedData;
 };
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const res = await fetch("https://pokeapi.co/api/v2/pokemon?limit=20");
-  const pokemonData = await res.json();
-
-  let completePokemonData: Pokemon[] = [];
+  const pokemonData: PokemonData = await res.json();
+  const { count, next, previous } = pokemonData;
+  let fetchedPokemons: Pokemon[] = [];
 
   for (const pokemon of pokemonData.results) {
     const res = await fetch(
       `https://pokeapi.co/api/v2/pokemon/${pokemon.name}`
     );
     const data = await res.json();
-    completePokemonData.push(data);
+    fetchedPokemons.push(data);
   }
+
   return {
-    props: { pokemon: completePokemonData },
+    props: { fetchedPokemons, data: { count, next, previous } },
   };
 };
 
-const Home: React.FC<HomeProps> = ({ pokemon }) => {
+const Home: React.FC<HomeProps> = ({ fetchedPokemons, data }) => {
+  console.log(data);
+  const [pokemons, setPokemons] = useState<Pokemon[] | []>(fetchedPokemons);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [loadMore, setLoadMore] = useState(data.next);
 
   const filteredPokemons = useMemo(
     () =>
-      pokemon.filter((pokemon) =>
+      pokemons?.filter((pokemon) =>
         pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
       ),
-    [searchQuery, pokemon]
+    [searchQuery, pokemons]
   );
+
+  const getMorePokemons = useCallback(async () => {
+    const res = await fetch(loadMore);
+    const data = await res.json();
+
+    setLoadMore(data.next);
+
+    data.results.forEach(async (pokemon: Pokemon) => {
+      const res = await fetch(
+        `https://pokeapi.co/api/v2/pokemon/${pokemon.name}`
+      );
+      const data = await res.json();
+      setPokemons((prevState) => [...prevState, data]);
+    });
+  }, [loadMore]);
 
   return (
     <div className={styles.container}>
@@ -66,6 +86,7 @@ const Home: React.FC<HomeProps> = ({ pokemon }) => {
           </div>
         ))}
       </main>
+      <button onClick={() => getMorePokemons()}>Load more</button>
     </div>
   );
 };
