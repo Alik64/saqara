@@ -11,7 +11,7 @@ const PokemonList: React.FC<PokemonListProps> = ({ pokemons }) => {
     <div className="flex flex-wrap justify-center gap-2">
       {pokemons &&
         pokemons.map((pokemon: any, index: number) => (
-          <Link href={`/pokemons/${pokemon.name}`} key={index}>
+          <Link href={`/pokemons/${pokemon.name}`} key={index} shallow={true}>
             <a>
               <PokemonCard pokemon={pokemon} />
             </a>

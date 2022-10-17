@@ -29,9 +29,9 @@ const PokemonPage: React.FC<PokemonProps> = ({ pokemon }) => {
   console.log(pokemon);
   return (
     <Layout title={pokemon.name}>
-      <div className=" w-full lg:max-w-full lg:flex">
+      <div className=" w-full lg:max-w-full lg:flex justify-center">
         <div className=" bg-white rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
-          <div className="flex items-center">
+          <div className=" sm:flex-row  flex flex-col items-center">
             <div className="flex flex-col items-center ">
               <img
                 src={pokemon.sprites.front_default}
@@ -39,16 +39,16 @@ const PokemonPage: React.FC<PokemonProps> = ({ pokemon }) => {
                 width={300}
                 height={300}
               />
-
-              <div className="text-sm">
+            </div>
+            <div className="sm:items-start flex flex-col  justify-center items-center">
+              <div className="text-sm px-6 pt-4 pb-2 flex  flex-col justify-center items-center mb-2">
                 <p className="text-gray-900 leading-none text-xl capitalize">
                   {pokemon.name}
                 </p>
                 <p className="text-gray-600 text-sm"># {pokemon.id}</p>
               </div>
-            </div>
-            <div className="flex flex-col items-start">
-              <div className="px-6 pt-4 pb-2 flex justify-center items-center mb-2">
+
+              <div className="sm:flex-row  px-6 pt-4 pb-2 flex flex-col justify-center items-center mb-2">
                 <h2 className="mr-4"> Types :</h2>
                 {pokemonTypes.map((type, index) => (
                   <div
@@ -62,7 +62,7 @@ const PokemonPage: React.FC<PokemonProps> = ({ pokemon }) => {
                   </div>
                 ))}
               </div>
-              <div className="px-6 pt-4 pb-2 flex justify-center items-center mb-2">
+              <div className="sm:flex-row px-6 pt-4 pb-2 flex flex-col justify-center items-center mb-2">
                 <h2 className="mr-4"> Abilities :</h2>
                 {pokemonAbilities.map((type, index) => (
                   <div
@@ -80,7 +80,9 @@ const PokemonPage: React.FC<PokemonProps> = ({ pokemon }) => {
       <div className="flex justify-center mt-4">
         <button
           className=" bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded w-24 "
-          onClick={() => router.back()}
+          onClick={() => {
+            router.back();
+          }}
         >
           Go back
         </button>

@@ -1,7 +1,7 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { GetServerSideProps } from "next";
 import { useQuery } from "react-query";
-
+import { useRouter } from "next/router";
 import { Pokemon, PokemonData } from "../interfaces";
 import pokeball from "../assets/images/pokeball.png";
 import styles from "../styles/Home.module.css";
@@ -43,7 +43,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
 
 const Home: React.FC<HomeProps> = ({ initialPokemonData }) => {
   const [page, setPage] = useState<number>(0);
-
+  const router = useRouter();
+  console.log(router);
   const { data: pokemons, isLoading } = useQuery(["pokemons", page], () =>
     getPokemons(page)
   );
@@ -60,15 +61,24 @@ const Home: React.FC<HomeProps> = ({ initialPokemonData }) => {
 
   const nextPageHandler = useCallback(() => {
     setPage((prevState) => prevState + 20);
+    router.query.page = (page + 20).toString();
+    router.push(router);
   }, [page]);
 
   const prevPageHandler = useCallback(() => {
     if (page === 0) {
       return;
     }
+    router.query.page = (page - 20).toString();
+    router.push(router);
     setPage((prevState) => prevState - 20);
   }, [page]);
 
+  useEffect(() => {
+    if (router.query?.page) {
+      setPage(Number(router.query.page));
+    }
+  }, [router.query]);
   return (
     <Layout title="Pokemons">
       <div className="flex justify-center flex-row my-2">
@@ -88,7 +98,11 @@ const Home: React.FC<HomeProps> = ({ initialPokemonData }) => {
           className="bg-blue-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 mr-3"
           name="generations"
           id="generations"
-          onChange={(e) => setPage(Number(e.target.value))}
+          onChange={(e) => {
+            router.query.page = e.target.value;
+            router.push(router);
+            setPage(Number(e.target.value));
+          }}
         >
           <option value="">Generations</option>
           <option value={0}>1</option>
