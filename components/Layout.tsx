@@ -1,5 +1,6 @@
 import Head from "next/head";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 import pokeball from "../assets/images/Pokeballpokeball.svg";
 
@@ -19,7 +20,15 @@ const Layout: React.FC<LayoutProps> = ({ children, content, title }) => {
       </Head>
 
       <div className="flex justify-center py-4 bg-blue-500">
-        <Image src={pokeball} height={50} width={50} />
+        <Link href={"/?page=0"}>
+          <Image
+            src={pokeball}
+            height={50}
+            width={50}
+            className="cursor-pointer"
+            title="Home"
+          />
+        </Link>
       </div>
       <div>{children}</div>
     </>

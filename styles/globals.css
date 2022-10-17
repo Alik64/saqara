@@ -22,3 +22,7 @@ a {
 option {
   text-align: center;
 }
+
+.errorSpan {
+  font-size: 80px;
+}
