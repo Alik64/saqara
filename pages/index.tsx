@@ -8,6 +8,7 @@ import styles from "../styles/Home.module.css";
 import PokemonList from "../components/PokemonList";
 import Layout from "../components/Layout";
 import Image from "next/image";
+import Loader from "../components/Loader";
 
 type InitialPokemonData = {
   count: number;
@@ -44,7 +45,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
 const Home: React.FC<HomeProps> = ({ initialPokemonData }) => {
   const [page, setPage] = useState<number>(0);
   const router = useRouter();
-  console.log(router);
+
   const { data: pokemons, isLoading } = useQuery(["pokemons", page], () =>
     getPokemons(page)
   );
@@ -117,7 +118,7 @@ const Home: React.FC<HomeProps> = ({ initialPokemonData }) => {
       </div>
       <main className={styles.main}>
         {isLoading ? (
-          <div>Loading...</div>
+          <Loader />
         ) : (
           <PokemonList pokemons={cashedFilteredPokemons} />
         )}
