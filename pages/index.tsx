@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { GetServerSideProps } from "next";
 import { useQuery } from "react-query";
+import { useRouter } from "next/router";
 
 import { Pokemon, PokemonData } from "../interfaces";
 
@@ -43,25 +44,21 @@ export const getServerSideProps: GetServerSideProps = async () => {
 const Home: React.FC<HomeProps> = ({ initialPokemonData }) => {
   const [page, setPage] = useState<number>(0);
 
-  const { data: pokemons, isLoading } = useQuery(
-    ["pokemons", page],
-    () => getPokemons(page),
-    {
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
-    }
+  console.log("router", page);
+
+  const { data: pokemons, isLoading } = useQuery(["pokemons", page], () =>
+    getPokemons(page)
   );
-  console.log(pokemons?.count);
+
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  const filteredPokemons = useMemo(
+  const cashedFilteredPokemons = useMemo(
     () =>
       pokemons?.fetchedPokemons?.filter((pokemon: any) =>
         pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
       ),
     [searchQuery, pokemons]
   );
-  console.log(filteredPokemons);
 
   const nextPageHandler = useCallback(() => {
     setPage((prevState) => prevState + 20);
@@ -104,7 +101,7 @@ const Home: React.FC<HomeProps> = ({ initialPokemonData }) => {
         {isLoading ? (
           <div>Loading...</div>
         ) : (
-          <PokemonList pokemons={filteredPokemons} />
+          <PokemonList pokemons={cashedFilteredPokemons} />
         )}
       </main>
       <section>
