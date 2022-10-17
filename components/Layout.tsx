@@ -21,13 +21,15 @@ const Layout: React.FC<LayoutProps> = ({ children, content, title }) => {
 
       <div className="flex justify-center py-4 bg-blue-500">
         <Link href={"/?page=0"}>
-          <Image
-            src={pokeball}
-            height={50}
-            width={50}
-            className="cursor-pointer"
-            title="Home"
-          />
+          <a>
+            <Image
+              src={pokeball}
+              height={50}
+              width={50}
+              className="cursor-pointer"
+              title="Home"
+            />
+          </a>
         </Link>
       </div>
       <div>{children}</div>

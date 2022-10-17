@@ -62,17 +62,21 @@ const Home: React.FC<HomeProps> = ({ initialPokemonData }) => {
 
   const nextPageHandler = useCallback(() => {
     setPage((prevState) => prevState + 20);
-    router.query.page = (page + 20).toString();
-    router.push(router);
+    router.push({
+      pathname: "/",
+      query: `page=` + (page + 20).toString(),
+    });
   }, [page]);
 
   const prevPageHandler = useCallback(() => {
     if (page === 0) {
       return;
     }
-    router.query.page = (page - 20).toString();
-    router.push(router);
     setPage((prevState) => prevState - 20);
+    router.push({
+      pathname: "/",
+      query: `page=` + (page - 20).toString(),
+    });
   }, [page]);
 
   useEffect(() => {
@@ -100,8 +104,12 @@ const Home: React.FC<HomeProps> = ({ initialPokemonData }) => {
           name="generations"
           id="generations"
           onChange={(e) => {
-            router.query.page = e.target.value;
-            router.push(router);
+            router.push({
+              pathname: "/",
+              query:
+                `
+              page=` + e.target.value,
+            });
             setPage(Number(e.target.value));
           }}
         >

@@ -11,9 +11,6 @@ function MyApp({ Component, pageProps }: AppProps) {
       queries: {
         refetchOnWindowFocus: false,
         refetchOnMount: false,
-        cacheTime: 1 * 60 * 60 * 1000,
-        staleTime: 1 * 60 * 60 * 1000,
-        retry: 1,
       },
     },
   });
