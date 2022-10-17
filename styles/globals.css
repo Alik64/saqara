@@ -18,3 +18,7 @@ a {
 * {
   box-sizing: border-box;
 }
+
+option {
+  text-align: center;
+}

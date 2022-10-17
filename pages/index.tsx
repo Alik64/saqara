@@ -72,7 +72,7 @@ const Home: React.FC<HomeProps> = ({ initialPokemonData }) => {
   return (
     <Layout title="Pokemons">
       <div className="flex justify-center flex-row my-2">
-        <span className="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 rounded-l-md border border-r-0 border-gray-300 ml-2">
+        <span className="inline-flex items-center px-3 text-sm text-gray-900 bg-blue-200 rounded-l-md border border-r-0 border-gray-300 ml-2">
           <Image src={pokeball} alt="pokeball" width={30} height={30} />
         </span>
 
@@ -85,7 +85,7 @@ const Home: React.FC<HomeProps> = ({ initialPokemonData }) => {
         />
 
         <select
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 mr-3"
+          className="bg-blue-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 mr-3"
           name="generations"
           id="generations"
           onChange={(e) => setPage(Number(e.target.value))}

@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import React from "react";
 import Layout from "../../components/Layout";
 import { Pokemon } from "../../interfaces";
+import styles from "../../styles/PokemonCard.module.css";
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${params?.name}`);
@@ -20,12 +21,70 @@ type PokemonProps = {
 const PokemonPage: React.FC<PokemonProps> = ({ pokemon }) => {
   const router = useRouter();
 
+  const pokemonTypes = pokemon.types.map((object) => object.type.name);
+  const pokemonAbilities = pokemon.abilities.map(
+    (object) => object.ability.name
+  );
+
+  console.log(pokemon);
   return (
     <Layout title={pokemon.name}>
-      <h1>{pokemon.name}</h1>
-      <img src={pokemon.sprites.front_default} alt="pokemon sprit" />
+      <div className=" w-full lg:max-w-full lg:flex">
+        <div className=" bg-white rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
+          <div className="flex items-center">
+            <div className="flex flex-col items-center ">
+              <img
+                src={pokemon.sprites.front_default}
+                alt="pokemon sprit"
+                width={300}
+                height={300}
+              />
 
-      <button onClick={() => router.back()}>Go back</button>
+              <div className="text-sm">
+                <p className="text-gray-900 leading-none text-xl capitalize">
+                  {pokemon.name}
+                </p>
+                <p className="text-gray-600 text-sm"># {pokemon.id}</p>
+              </div>
+            </div>
+            <div className="flex flex-col items-start">
+              <div className="px-6 pt-4 pb-2 flex justify-center items-center mb-2">
+                <h2 className="mr-4"> Types :</h2>
+                {pokemonTypes.map((type, index) => (
+                  <div
+                    className={
+                      `inline-block rounded-full px-3 py-1 text-sm font-semibold text-slate-50 mr-2 ` +
+                      styles[type]
+                    }
+                    key={index}
+                  >
+                    {type}
+                  </div>
+                ))}
+              </div>
+              <div className="px-6 pt-4 pb-2 flex justify-center items-center mb-2">
+                <h2 className="mr-4"> Abilities :</h2>
+                {pokemonAbilities.map((type, index) => (
+                  <div
+                    className="inline-block rounded-full px-3 py-1 text-sm font-semibold text-blue-500 mr-2 capitalize"
+                    key={index}
+                  >
+                    {type}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="flex justify-center mt-4">
+        <button
+          className=" bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded w-24 "
+          onClick={() => router.back()}
+        >
+          Go back
+        </button>
+      </div>
     </Layout>
   );
 };

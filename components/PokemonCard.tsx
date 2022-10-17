@@ -1,6 +1,7 @@
 import React from "react";
 import { Pokemon } from "../interfaces";
 import styles from "../styles/PokemonCard.module.css";
+
 type PokemonCardProps = {
   pokemon: Pokemon;
 };

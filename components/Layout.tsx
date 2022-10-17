@@ -2,11 +2,13 @@ import Head from "next/head";
 import Image from "next/image";
 import React from "react";
 import pokeball from "../assets/images/Pokeballpokeball.svg";
+
 type LayoutProps = {
   content?: string;
   title: string;
   children: JSX.Element | JSX.Element[];
 };
+
 const Layout: React.FC<LayoutProps> = ({ children, content, title }) => {
   return (
     <>
