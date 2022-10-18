@@ -64,7 +64,7 @@ const Home: React.FC<HomeProps> = ({ initialPokemonData }) => {
     setPage((prevState) => prevState + 20);
     router.push({
       pathname: "/",
-      query: `page=` + (page + 20).toString(),
+      query: "page=" + (page + 20).toString(),
     });
   }, [page]);
 
@@ -75,7 +75,7 @@ const Home: React.FC<HomeProps> = ({ initialPokemonData }) => {
     setPage((prevState) => prevState - 20);
     router.push({
       pathname: "/",
-      query: `page=` + (page - 20).toString(),
+      query: "page=" + (page - 20).toString(),
     });
   }, [page]);
 
@@ -106,9 +106,7 @@ const Home: React.FC<HomeProps> = ({ initialPokemonData }) => {
           onChange={(e) => {
             router.push({
               pathname: "/",
-              query:
-                `
-              page=` + e.target.value,
+              query: "page=" + e.target.value,
             });
             setPage(Number(e.target.value));
           }}
